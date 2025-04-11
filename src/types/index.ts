@@ -1,60 +1,24 @@
-export interface TourPlan {
-    id: string;
-    title: string;
-    stayDuration: string;
-    courseNumber: string;
-    businessTripType: string;
-    price: number;
-    departurePlace: string;
-    destination: string;
-    capacity: string;
-    minCapacity: string;
-    meals: {
-      breakfast: number;
-      lunch: number;
-      dinner: number;
-    };
-  }
-  export interface CalendarDay {
-    date: number;
-    isCurrentMonth: boolean;
-    isAvailable: boolean;
-    price?: number;
-  }
-  
-  export interface TourDetails {
-    id: string;
-    title: string;
-    stayDuration: string;
-    courseNumber: string;
-    businessTripType: string;
-    price: number;
-    details: {
-      date: string;
-      capacity: string;
-      transportation: string;
-      busSize: string;
-      cancellation: string;
-      pickupService: string;
-      tourType: string;
-    };
-  }
-  export interface ItineraryDay {
-    day: number;
-    schedule: Array<{
-      time?: string;
-      place?: string;
-      description: string;
-      notes?: string;
-    }>;
-    meals: {
-      breakfast: boolean;
-      lunch: boolean;
-      dinner: boolean;
-    };
-  }
-  export interface ConditionItem {
-    title: string;
-    content: React.ReactNode;
-  }
-      
+// src/types/index.ts
+export type TourDetail = {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  duration: string;
+  departureDate: string;
+};
+
+export type ItineraryItem = {
+  time: string;
+  content: string;
+};
+
+export type TourItinerary = {
+  id: number;
+  schedule: ItineraryItem[];
+};
+
+export type TourCondition = {
+  id: number;
+  conditions: string[];
+};

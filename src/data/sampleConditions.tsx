@@ -1,15 +1,20 @@
-import { ConditionItem } from '../types';
-
-export const sampleConditions: ConditionItem[] = [
+export const sampleConditions = [
   {
-    title: '重要事項',
-    content: (
-      <div className="border border-red-200 p-4 bg-red-50 mb-6">
-        <p>旅行代金は 大人1名を表示しています。（ ）内料金は子供旅行代金です。</p>
-        <p>年齢区分 大人〇〇歳～、子供〇〇歳～、幼児〇〇歳～〇〇歳</p>
-        <p>設定期間 2025年〇月〇〇日～2025年〇月〇〇日</p>
-      </div>
-    ),
+    id: 1,
+    conditions: {
+      applicationFee: '10,000円',
+      included: [
+        '交通費',
+        '宿泊費',
+        '食事代'
+      ],
+      minimumParticipants: '最少催行人員20名',
+      cancellationPolicy: [
+        '出発日7日前〜2日前: 30%',
+        '出発日前日: 50%',
+        '当日: 100%'
+      ]
+    }
   },
-  // 他の項目も同様に続けて記載
+  // 他のツアーも同様の構造で作成
 ];

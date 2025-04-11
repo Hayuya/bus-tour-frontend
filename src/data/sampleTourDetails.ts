@@ -1,19 +1,29 @@
-import { TourDetails } from '../types';
-
-export const sampleTourDetails: TourDetails = {
-  id: '1',
-  title: '【宿泊】栗林公園に咲く"恋つづじ"と瀬戸内ビューの絶景ホテル休暇村讃岐五色台',
-  stayDuration: 'お宿泊満たっぷり17時間！海側のお部屋確約◎',
-  courseNumber: 'OOOOOOO',
-  businessTripType: '乗務員同行',
-  price: 12980,
-  details: {
-    date: '1泊2日',
-    capacity: '募集人員40名 (最小催行人員20名)',
-    transportation: '添乗あり',
-    busSize: '中型以上',
-    cancellation: '旅行の1回目 最大2回 最小1回',
-    pickupService: '代替地発着の設定はございません',
-    tourType: '定期（地域のお客様限定）'
-  }
-};
+export const sampleTourDetails = [
+  {
+    id: 1,
+    highlights: [
+      '海側のお部屋確約',
+      '旬の瀬戸内食材ビュッフェ',
+      '栗林公園散策',
+    ],
+    period: '2025年6月1日〜2025年6月30日',
+  },
+  {
+    id: 2,
+    highlights: [
+      'しまなみ海道絶景巡り',
+      'ご当地グルメ体験',
+      'お土産付き',
+    ],
+    period: '2025年7月10日〜2025年7月20日',
+  },
+  {
+    id: 3,
+    highlights: [
+      '秘境の天然温泉',
+      '地元食材の豪華料理',
+      '癒しの宿泊施設',
+    ],
+    period: '2025年8月1日〜2025年8月31日',
+  },
+];
