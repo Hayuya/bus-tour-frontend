@@ -56,7 +56,7 @@ const Footer: React.FC = () => {
                   旅行・楽しむ
                 </MuiLink>
                 <MuiLink href="#" color="inherit" underline="hover" display="block" sx={{ mb: 0.5 }}>
-                  まずいよぉ～
+                  各種お問い合わせ
                 </MuiLink>
               </Grid>
             </Grid>
