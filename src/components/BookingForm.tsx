@@ -18,8 +18,16 @@ import {
   Alert,
   Stepper,
   Step,
-  StepLabel
+  StepLabel,
+  Paper,
+  IconButton,
+  InputLabel,
+  Select,
+  FormHelperText,
+  CircularProgress
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -28,84 +36,145 @@ import ja from 'date-fns/locale/ja';
 interface BookingFormProps {
   onSubmit: (formData: any) => void;
   tourId: number;
+  userData?: {
+    userId: string;
+    name: string;
+    nameKana: string;
+    birthdate: Date | null;
+  };
+}
+
+interface CompanionInfo {
+  name: string;
+  nameKana: string;
+  birthdate: Date | null;
 }
 
 interface FormData {
-  representativeName: string;
-  representativeNameKana: string;
-  email: string;
-  confirmEmail: string;
-  phone: string;
-  postalCode: string;
-  prefecture: string;
-  city: string;
-  address: string;
-  building: string;
-  reservationDate: Date | null;
-  numberOfAdults: string;
-  numberOfChildren: string;
-  paymentMethod: string;
-  emergencyContact: string;
+  // 同行者情報
+  companions: CompanionInfo[];
+  
+  // 保険加入
+  insuranceOption: string;
+  
+  // 乗降車場所
+  boardingLocation: string;
+  dropOffLocation: string;
+  
+  // その他
   specialRequests: string;
-  privacyPolicy: boolean;
+  
+  // 予約の承認
   termsAndConditions: boolean;
 }
 
-// 都道府県リスト
-const prefectures = [
-  '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
-  '茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県',
-  '新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県',
-  '静岡県', '愛知県', '三重県', '滋賀県', '京都府', '大阪府', '兵庫県',
-  '奈良県', '和歌山県', '鳥取県', '島根県', '岡山県', '広島県', '山口県',
-  '徳島県', '香川県', '愛媛県', '高知県', '福岡県', '佐賀県', '長崎県',
-  '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'
-];
-
-const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
+const BookingForm: React.FC<BookingFormProps> = ({ 
+  onSubmit, 
+  tourId,
+  userData = {
+    userId: 'dummy_id',
+    name: '山田 太郎',
+    nameKana: 'ヤマダ タロウ',
+    birthdate: new Date(1980, 0, 1)
+  }
+}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   
   const [formData, setFormData] = useState<FormData>({
-    representativeName: '',
-    representativeNameKana: '',
-    email: '',
-    confirmEmail: '',
-    phone: '',
-    postalCode: '',
-    prefecture: '',
-    city: '',
-    address: '',
-    building: '',
-    reservationDate: null,
-    numberOfAdults: '1',
-    numberOfChildren: '0',
-    paymentMethod: 'credit_card',
-    emergencyContact: '',
+    companions: [],
+    insuranceOption: 'apply',
+    boardingLocation: '',
+    dropOffLocation: '',
     specialRequests: '',
-    privacyPolicy: false,
     termsAndConditions: false
   });
   
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [errors, setErrors] = useState<{
+    companions?: Record<number, Partial<Record<keyof CompanionInfo, string>>>;
+    boardingLocation?: string;
+    dropOffLocation?: string;
+    termsAndConditions?: string;
+  }>({});
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  // 同行者の追加
+  const addCompanion = () => {
     setFormData({
       ...formData,
-      [name]: value
+      companions: [
+        ...formData.companions,
+        { name: '', nameKana: '', birthdate: null }
+      ]
+    });
+  };
+
+  // 同行者の削除
+  const removeCompanion = (index: number) => {
+    const newCompanions = [...formData.companions];
+    newCompanions.splice(index, 1);
+    
+    setFormData({
+      ...formData,
+      companions: newCompanions
     });
     
-    // エラー状態をクリア
-    if (errors[name as keyof FormData]) {
-      setErrors({
-        ...errors,
-        [name]: undefined
+    // エラー状態も更新
+    if (errors.companions && errors.companions[index]) {
+      const newErrors = { ...errors };
+      const newCompanionErrors = { ...newErrors.companions } as Record<number, any>;
+      delete newCompanionErrors[index];
+      
+      // インデックスを詰める
+      const updatedCompanionErrors: Record<number, any> = {};
+      Object.keys(newCompanionErrors).forEach((key) => {
+        const keyIndex = parseInt(key);
+        if (keyIndex > index) {
+          updatedCompanionErrors[keyIndex - 1] = newCompanionErrors[keyIndex];
+        } else {
+          updatedCompanionErrors[keyIndex] = newCompanionErrors[keyIndex];
+        }
       });
+      
+      newErrors.companions = updatedCompanionErrors;
+      setErrors(newErrors);
     }
   };
 
+  // 同行者情報の入力ハンドラ
+  const handleCompanionChange = (index: number, field: keyof CompanionInfo, value: any) => {
+    const newCompanions = [...formData.companions];
+    newCompanions[index] = {
+      ...newCompanions[index],
+      [field]: value
+    };
+    
+    setFormData({
+      ...formData,
+      companions: newCompanions
+    });
+    
+    // エラー状態をクリア
+    if (errors.companions && errors.companions[index] && errors.companions[index][field]) {
+      const newErrors = { ...errors };
+      if (!newErrors.companions) {
+        newErrors.companions = {};
+      }
+      
+      if (!newErrors.companions[index]) {
+        newErrors.companions[index] = {};
+      }
+      
+      newErrors.companions[index] = {
+        ...newErrors.companions[index],
+        [field]: undefined
+      };
+      
+      setErrors(newErrors);
+    }
+  };
+
+  // チェックボックスの変更ハンドラ
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
     setFormData({
@@ -114,102 +183,151 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
     });
     
     // エラー状態をクリア
-    if (errors[name as keyof FormData]) {
+    if (name === 'termsAndConditions' && errors.termsAndConditions) {
       setErrors({
         ...errors,
-        [name]: undefined
+        termsAndConditions: undefined
       });
     }
   };
 
-  const handleDateChange = (date: Date | null) => {
+  // ラジオボタンやセレクトの変更ハンドラ
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+    const { name, value } = e.target;
+    if (name) {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+      
+      // エラー状態をクリア
+      if (name === 'boardingLocation' && errors.boardingLocation) {
+        setErrors({
+          ...errors,
+          boardingLocation: undefined
+        });
+      } else if (name === 'dropOffLocation' && errors.dropOffLocation) {
+        setErrors({
+          ...errors,
+          dropOffLocation: undefined
+        });
+      }
+    }
+  };
+
+  // テキストフィールドの変更ハンドラ
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      reservationDate: date
+      [name]: value
     });
-    
-    // エラー状態をクリア
-    if (errors.reservationDate) {
-      setErrors({
-        ...errors,
-        reservationDate: undefined
-      });
-    }
   };
 
-  const validateStep = (step: number): boolean => {
-    const newErrors: Partial<Record<keyof FormData, string>> = {};
+  // ステップ1のバリデーション
+  const validateStep1 = (): boolean => {
+    const newErrors: {
+      companions?: Record<number, Partial<Record<keyof CompanionInfo, string>>>;
+    } = {};
+    let isValid = true;
     
-    if (step === 0) {
-      if (!formData.representativeName) {
-        newErrors.representativeName = '代表者氏名を入力してください';
-      }
+    // 同行者情報のバリデーション
+    if (formData.companions.length > 0) {
+      newErrors.companions = {};
       
-      if (!formData.representativeNameKana) {
-        newErrors.representativeNameKana = '代表者氏名（カナ）を入力してください';
-      }
-      
-      if (!formData.email) {
-        newErrors.email = 'メールアドレスを入力してください';
-      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = '有効なメールアドレスを入力してください';
-      }
-      
-      if (formData.email !== formData.confirmEmail) {
-        newErrors.confirmEmail = 'メールアドレスが一致しません';
-      }
-      
-      if (!formData.phone) {
-        newErrors.phone = '電話番号を入力してください';
-      }
-    }
-    
-    if (step === 1) {
-      if (!formData.postalCode) {
-        newErrors.postalCode = '郵便番号を入力してください';
-      }
-      
-      if (!formData.prefecture) {
-        newErrors.prefecture = '都道府県を選択してください';
-      }
-      
-      if (!formData.city) {
-        newErrors.city = '市区町村を入力してください';
-      }
-      
-      if (!formData.address) {
-        newErrors.address = '番地を入力してください';
-      }
-      
-      if (!formData.reservationDate) {
-        newErrors.reservationDate = '予約日を選択してください';
-      }
-    }
-    
-    if (step === 2) {
-      if (!formData.privacyPolicy) {
-        newErrors.privacyPolicy = 'プライバシーポリシーに同意してください';
-      }
-      
-      if (!formData.termsAndConditions) {
-        newErrors.termsAndConditions = '利用規約に同意してください';
-      }
+      formData.companions.forEach((companion, index) => {
+        const companionErrors: Partial<Record<keyof CompanionInfo, string>> = {};
+        
+        if (!companion.name) {
+          companionErrors.name = 'お名前を入力してください';
+          isValid = false;
+        }
+        
+        if (!companion.nameKana) {
+          companionErrors.nameKana = 'お名前（カナ）を入力してください';
+          isValid = false;
+        }
+        
+        if (!companion.birthdate) {
+          companionErrors.birthdate = '生年月日を入力してください';
+          isValid = false;
+        }
+        
+        if (Object.keys(companionErrors).length > 0) {
+          newErrors.companions[index] = companionErrors;
+        }
+      });
     }
     
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return isValid;
   };
-
+  
+  // ステップ2のバリデーション
+  const validateStep2 = (): boolean => {
+    const newErrors: {
+      boardingLocation?: string;
+      dropOffLocation?: string;
+    } = {};
+    let isValid = true;
+    
+    if (!formData.boardingLocation) {
+      newErrors.boardingLocation = '乗車場所を選択してください';
+      isValid = false;
+    }
+    
+    if (!formData.dropOffLocation) {
+      newErrors.dropOffLocation = '降車場所を選択してください';
+      isValid = false;
+    }
+    
+    setErrors(newErrors);
+    return isValid;
+  };
+  
+  // ステップ3のバリデーション
+  const validateStep3 = (): boolean => {
+    const newErrors: {
+      termsAndConditions?: string;
+    } = {};
+    let isValid = true;
+    
+    if (!formData.termsAndConditions) {
+      newErrors.termsAndConditions = '予約確定には利用規約への同意が必要です';
+      isValid = false;
+    }
+    
+    setErrors(newErrors);
+    return isValid;
+  };
+  
+  // 現在のステップに応じてバリデーションを実行
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 0:
+        return validateStep1();
+      case 1:
+        return validateStep2();
+      case 2:
+        return validateStep3();
+      default:
+        return true;
+    }
+  };
+  
+  // 次へ進むハンドラ
   const handleNext = () => {
     if (validateStep(activeStep)) {
       setActiveStep((prevStep) => prevStep + 1);
     }
   };
-
+  
+  // 戻るハンドラ
   const handleBack = () => {
     setActiveStep((prevStep) => prevStep - 1);
   };
-
+  
+  // フォーム送信ハンドラ
   const handleSubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -219,7 +337,8 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
       // 送信データを準備
       const submissionData = {
         ...formData,
-        tourId
+        tourId,
+        userId: userData.userId
       };
       
       // 送信処理（擬似的な遅延を追加）
@@ -230,333 +349,85 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
       }, 1500);
     }
   };
+  
+  const steps = ['同行者情報', '乗降車場所', '確認・送信'];
+  
+  // 乗車場所のオプション
+  const boardingLocations = [
+    '芸陽バス本社（駐車場利用あり）',
+    '芸陽バス本社（駐車場利用なし）',
+    '西条駅南口',
+    '広島駅'
+  ];
+  
+  // 降車場所のオプション
+  const dropOffLocations = [
+    '芸陽バス本社',
+    '西条駅南口',
+    '広島駅'
+  ];
+  
+  // 予約完了時の表示
+  if (submitted) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          予約リクエストを受け付けました
+        </Typography>
+        <Typography variant="body1" paragraph>
+          ご予約ありがとうございます。確認メールをお送りしましたので、ご確認ください。
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          予約番号: TRX-{tourId}-{Math.floor(Math.random() * 10000)}
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          href="/"
+          sx={{ mt: 4 }}
+        >
+          トップページに戻る
+        </Button>
+      </Box>
+    );
+  }
 
-  const steps = ['基本情報', '予約詳細', '確認・送信'];
-
+  // 各ステップのコンテンツをレンダリング
   const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
         return (
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                代表者情報
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  代表者情報
+                </Typography>
+              </Box>
               <Divider sx={{ mb: 2 }} />
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="representativeName"
-                label="代表者氏名"
-                fullWidth
-                required
-                value={formData.representativeName}
-                onChange={handleInputChange}
-                error={!!errors.representativeName}
-                helperText={errors.representativeName}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <TextField
-                name="representativeNameKana"
-                label="代表者氏名（カナ）"
-                fullWidth
-                required
-                value={formData.representativeNameKana}
-                onChange={handleInputChange}
-                error={!!errors.representativeNameKana}
-                helperText={errors.representativeNameKana}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="email"
-                label="メールアドレス"
-                type="email"
-                fullWidth
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                error={!!errors.email}
-                helperText={errors.email}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="confirmEmail"
-                label="メールアドレス（確認用）"
-                type="email"
-                fullWidth
-                required
-                value={formData.confirmEmail}
-                onChange={handleInputChange}
-                error={!!errors.confirmEmail}
-                helperText={errors.confirmEmail}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="phone"
-                label="電話番号"
-                fullWidth
-                required
-                value={formData.phone}
-                onChange={handleInputChange}
-                error={!!errors.phone}
-                helperText={errors.phone}
-              />
-            </Grid>
-          </Grid>
-        );
-        
-      case 1:
-        return (
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                住所情報
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-            </Grid>
-            
-            <Grid item xs={12} sm={4}>
-              <TextField
-                name="postalCode"
-                label="郵便番号"
-                fullWidth
-                required
-                value={formData.postalCode}
-                onChange={handleInputChange}
-                error={!!errors.postalCode}
-                helperText={errors.postalCode}
-                placeholder="123-4567"
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={8}>
-              <TextField
-                name="prefecture"
-                label="都道府県"
-                select
-                fullWidth
-                required
-                value={formData.prefecture}
-                onChange={handleInputChange}
-                error={!!errors.prefecture}
-                helperText={errors.prefecture}
-              >
-                {prefectures.map((pref) => (
-                  <MenuItem key={pref} value={pref}>{pref}</MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="city"
-                label="市区町村"
-                fullWidth
-                required
-                value={formData.city}
-                onChange={handleInputChange}
-                error={!!errors.city}
-                helperText={errors.city}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="address"
-                label="番地"
-                fullWidth
-                required
-                value={formData.address}
-                onChange={handleInputChange}
-                error={!!errors.address}
-                helperText={errors.address}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="building"
-                label="建物名・部屋番号"
-                fullWidth
-                value={formData.building}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mt: 2 }}>
-                予約情報
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-            </Grid>
-            
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
-                <DatePicker
-                  label="予約日"
-                  value={formData.reservationDate}
-                  onChange={handleDateChange}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      required: true,
-                      error: !!errors.reservationDate,
-                      helperText: errors.reservationDate
-                    }
-                  }}
-                />
-              </LocalizationProvider>
-            </Grid>
-            
-            <Grid item xs={6} sm={3}>
-              <TextField
-                name="numberOfAdults"
-                label="大人"
-                type="number"
-                fullWidth
-                required
-                InputProps={{ inputProps: { min: 1 } }}
-                value={formData.numberOfAdults}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            
-            <Grid item xs={6} sm={3}>
-              <TextField
-                name="numberOfChildren"
-                label="子供"
-                type="number"
-                fullWidth
-                InputProps={{ inputProps: { min: 0 } }}
-                value={formData.numberOfChildren}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">お支払い方法</FormLabel>
-                <RadioGroup
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={handleInputChange}
-                  row
-                >
-                  <FormControlLabel value="credit_card" control={<Radio />} label="クレジットカード" />
-                  <FormControlLabel value="bank_transfer" control={<Radio />} label="銀行振込" />
-                  <FormControlLabel value="convenience_store" control={<Radio />} label="コンビニ払い" />
-                </RadioGroup>
-              </FormControl>
-            </Grid>
-          </Grid>
-        );
-        
-      case 2:
-        return (
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                追加情報
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="emergencyContact"
-                label="緊急連絡先"
-                fullWidth
-                value={formData.emergencyContact}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                name="specialRequests"
-                label="特別なご要望"
-                multiline
-                rows={4}
-                fullWidth
-                value={formData.specialRequests}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ mt: 2 }}>
-                予約内容の確認
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-            </Grid>
-            
-            <Grid item xs={12}>
+              
               <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f9f9f9' }}>
                 <Grid container spacing={2}>
                   <Grid item xs={4} sm={3}>
                     <Typography variant="body2" color="text.secondary">代表者氏名</Typography>
                   </Grid>
                   <Grid item xs={8} sm={9}>
-                    <Typography variant="body2">{formData.representativeName}</Typography>
+                    <Typography variant="body2">{userData.name}</Typography>
                   </Grid>
                   
                   <Grid item xs={4} sm={3}>
-                    <Typography variant="body2" color="text.secondary">メールアドレス</Typography>
+                    <Typography variant="body2" color="text.secondary">代表者氏名（カナ）</Typography>
                   </Grid>
                   <Grid item xs={8} sm={9}>
-                    <Typography variant="body2">{formData.email}</Typography>
+                    <Typography variant="body2">{userData.nameKana}</Typography>
                   </Grid>
                   
                   <Grid item xs={4} sm={3}>
-                    <Typography variant="body2" color="text.secondary">電話番号</Typography>
-                  </Grid>
-                  <Grid item xs={8} sm={9}>
-                    <Typography variant="body2">{formData.phone}</Typography>
-                  </Grid>
-                  
-                  <Grid item xs={4} sm={3}>
-                    <Typography variant="body2" color="text.secondary">住所</Typography>
+                    <Typography variant="body2" color="text.secondary">生年月日</Typography>
                   </Grid>
                   <Grid item xs={8} sm={9}>
                     <Typography variant="body2">
-                      〒{formData.postalCode} {formData.prefecture}{formData.city}{formData.address} {formData.building}
-                    </Typography>
-                  </Grid>
-                  
-                  <Grid item xs={4} sm={3}>
-                    <Typography variant="body2" color="text.secondary">予約日</Typography>
-                  </Grid>
-                  <Grid item xs={8} sm={9}>
-                    <Typography variant="body2">
-                      {formData.reservationDate ? formData.reservationDate.toLocaleDateString('ja-JP') : '未選択'}
-                    </Typography>
-                  </Grid>
-                  
-                  <Grid item xs={4} sm={3}>
-                    <Typography variant="body2" color="text.secondary">人数</Typography>
-                  </Grid>
-                  <Grid item xs={8} sm={9}>
-                    <Typography variant="body2">
-                      大人: {formData.numberOfAdults}名 / 子供: {formData.numberOfChildren}名
-                    </Typography>
-                  </Grid>
-                  
-                  <Grid item xs={4} sm={3}>
-                    <Typography variant="body2" color="text.secondary">お支払い方法</Typography>
-                  </Grid>
-                  <Grid item xs={8} sm={9}>
-                    <Typography variant="body2">
-                      {formData.paymentMethod === 'credit_card' ? 'クレジットカード' : 
-                       formData.paymentMethod === 'bank_transfer' ? '銀行振込' : 'コンビニ払い'}
+                      {userData.birthdate ? userData.birthdate.toLocaleDateString('ja-JP') : '未設定'}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -564,24 +435,256 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
             </Grid>
             
             <Grid item xs={12}>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="privacyPolicy"
-                      checked={formData.privacyPolicy}
-                      onChange={handleCheckboxChange}
-                      color="primary"
-                    />
-                  }
-                  label="プライバシーポリシーに同意します"
-                />
-                {errors.privacyPolicy && (
-                  <Typography variant="caption" color="error">
-                    {errors.privacyPolicy}
-                  </Typography>
-                )}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  同行者情報
+                </Typography>
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={addCompanion}
+                  variant="outlined"
+                  size="small"
+                >
+                  同行者を追加
+                </Button>
+              </Box>
+              <Divider sx={{ mb: 2 }} />
+              
+              {formData.companions.length === 0 ? (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  同行者がいる場合は「同行者を追加」ボタンをクリックしてください
+                </Alert>
+              ) : (
+                formData.companions.map((companion, index) => (
+                  <Box key={index} sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="subtitle2">同行者 {index + 1}</Typography>
+                      <IconButton 
+                        onClick={() => removeCompanion(index)}
+                        size="small"
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                    
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="氏名"
+                          required
+                          value={companion.name}
+                          onChange={(e) => handleCompanionChange(index, 'name', e.target.value)}
+                          error={!!(errors.companions && errors.companions[index]?.name)}
+                          helperText={errors.companions && errors.companions[index]?.name}
+                        />
+                      </Grid>
+                      
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="氏名（カナ）"
+                          required
+                          value={companion.nameKana}
+                          onChange={(e) => handleCompanionChange(index, 'nameKana', e.target.value)}
+                          error={!!(errors.companions && errors.companions[index]?.nameKana)}
+                          helperText={errors.companions && errors.companions[index]?.nameKana}
+                        />
+                      </Grid>
+                      
+                      <Grid item xs={12}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+                          <DatePicker
+                            label="生年月日"
+                            value={companion.birthdate}
+                            onChange={(date) => handleCompanionChange(index, 'birthdate', date)}
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                required: true,
+                                error: !!(errors.companions && errors.companions[index]?.birthdate),
+                                helperText: errors.companions && errors.companions[index]?.birthdate
+                              }
+                            }}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                ))
+              )}
+            </Grid>
+          </Grid>
+        );
+      
+      case 1:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                保険加入について
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <FormControl component="fieldset" sx={{ mb: 3 }}>
+                <FormLabel component="legend">旅行傷害保険への加入</FormLabel>
+                <RadioGroup
+                  name="insuranceOption"
+                  value={formData.insuranceOption}
+                  onChange={handleInputChange}
+                  row
+                >
+                  <FormControlLabel value="apply" control={<Radio />} label="申し込む（+500円）" />
+                  <FormControlLabel value="not_apply" control={<Radio />} label="申し込まない" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                乗降車場所
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth required error={!!errors.boardingLocation} sx={{ mb: 2 }}>
+                    <InputLabel id="boarding-location-label">乗車場所</InputLabel>
+                    <Select
+                      labelId="boarding-location-label"
+                      name="boardingLocation"
+                      value={formData.boardingLocation}
+                      onChange={handleInputChange}
+                      label="乗車場所"
+                    >
+                      {boardingLocations.map((location) => (
+                        <MenuItem key={location} value={location}>{location}</MenuItem>
+                      ))}
+                    </Select>
+                    {errors.boardingLocation && <FormHelperText>{errors.boardingLocation}</FormHelperText>}
+                  </FormControl>
+                </Grid>
                 
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth required error={!!errors.dropOffLocation} sx={{ mb: 2 }}>
+                    <InputLabel id="drop-off-location-label">降車場所</InputLabel>
+                    <Select
+                      labelId="drop-off-location-label"
+                      name="dropOffLocation"
+                      value={formData.dropOffLocation}
+                      onChange={handleInputChange}
+                      label="降車場所"
+                    >
+                      {dropOffLocations.map((location) => (
+                        <MenuItem key={location} value={location}>{location}</MenuItem>
+                      ))}
+                    </Select>
+                    {errors.dropOffLocation && <FormHelperText>{errors.dropOffLocation}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                備考欄
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <TextField
+                name="specialRequests"
+                label="ご不明点や、ご要望があればご記入ください"
+                multiline
+                rows={4}
+                fullWidth
+                value={formData.specialRequests}
+                onChange={handleTextChange}
+              />
+            </Grid>
+          </Grid>
+        );
+      
+      case 2:
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                予約内容の確認
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f9f9f9', mb: 3 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={4} sm={3}>
+                    <Typography variant="body2" color="text.secondary">代表者氏名</Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={9}>
+                    <Typography variant="body2">{userData.name}</Typography>
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Divider sx={{ my: 1 }} />
+                  </Grid>
+                  
+                  <Grid item xs={4} sm={3}>
+                    <Typography variant="body2" color="text.secondary">同行者</Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={9}>
+                    {formData.companions.length === 0 ? (
+                      <Typography variant="body2">なし</Typography>
+                    ) : (
+                      formData.companions.map((companion, index) => (
+                        <Typography key={index} variant="body2">
+                          {companion.name}（{companion.nameKana}）
+                        </Typography>
+                      ))
+                    )}
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Divider sx={{ my: 1 }} />
+                  </Grid>
+                  
+                  <Grid item xs={4} sm={3}>
+                    <Typography variant="body2" color="text.secondary">保険加入</Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={9}>
+                    <Typography variant="body2">
+                      {formData.insuranceOption === 'apply' ? '申し込む（+500円）' : '申し込まない'}
+                    </Typography>
+                  </Grid>
+                  
+                  <Grid item xs={4} sm={3}>
+                    <Typography variant="body2" color="text.secondary">乗車場所</Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={9}>
+                    <Typography variant="body2">{formData.boardingLocation}</Typography>
+                  </Grid>
+                  
+                  <Grid item xs={4} sm={3}>
+                    <Typography variant="body2" color="text.secondary">降車場所</Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={9}>
+                    <Typography variant="body2">{formData.dropOffLocation}</Typography>
+                  </Grid>
+                  
+                  {formData.specialRequests && (
+                    <>
+                      <Grid item xs={4} sm={3}>
+                        <Typography variant="body2" color="text.secondary">備考</Typography>
+                      </Grid>
+                      <Grid item xs={8} sm={9}>
+                        <Typography variant="body2" style={{ whiteSpace: 'pre-line' }}>
+                          {formData.specialRequests}
+                        </Typography>
+                      </Grid>
+                    </>
+                  )}
+                </Grid>
+              </Paper>
+              
+              <FormGroup>
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -608,30 +711,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
     }
   };
 
-  if (submitted) {
-    return (
-      <Box sx={{ textAlign: 'center', py: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          予約リクエストを受け付けました
-        </Typography>
-        <Typography variant="body1" paragraph>
-          ご予約ありがとうございます。確認メールをお送りしましたので、ご確認ください。
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          予約番号: TRX-{tourId}-{Math.floor(Math.random() * 10000)}
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          href="/"
-          sx={{ mt: 4 }}
-        >
-          トップページに戻る
-        </Button>
-      </Box>
-    );
-  }
-
+  // フォームのレンダリング
   return (
     <Box component="form" onSubmit={handleSubmitForm}>
       <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
@@ -660,7 +740,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
             color="primary"
             disabled={submitting}
           >
-            {submitting ? '送信中...' : '予約を確定する'}
+            {submitting ? <CircularProgress size={24} /> : '予約を確定する'}
           </Button>
         ) : (
           <Button
@@ -676,6 +756,3 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmit, tourId }) => {
 };
 
 export default BookingForm;
-
-// Note: You'll need to install @mui/x-date-pickers and date-fns:
-// npm install @mui/x-date-pickers date-fns

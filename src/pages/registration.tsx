@@ -2,19 +2,14 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Typography, Box, Paper, Divider } from '@mui/material';
-import BookingForm from '../components/BookingForm';
 import { samplePlans } from '../data/samplePlans';
+import BookingWorkflow from '../components/BookingWorkflow';
 
 const RegistrationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const tourId = parseInt(id || '1', 10);
   
   const plan = samplePlans.find(p => p.id === tourId);
-
-  const handleSubmit = (formData: any) => {
-    console.log('フォーム送信データ:', formData);
-    // TODO: 後ほどAxiosでバックエンド送信処理を実装
-  };
 
   if (!plan) {
     return (
@@ -25,51 +20,71 @@ const RegistrationPage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
-        <Typography variant="h5" component="h1" gutterBottom>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2, mb: 4 }}>
+        <Typography variant="h5" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
           予約フォーム
         </Typography>
         
-        <Box sx={{ mb: 4, mt: 2 }}>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+        <Box 
+          sx={{ 
+            bgcolor: 'primary.main', 
+            color: 'white', 
+            py: 1, 
+            px: 2, 
+            borderRadius: '4px 4px 0 0',
+            mb: 2
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight="bold">
             ツアー情報
           </Typography>
-          <Divider sx={{ mb: 2 }} />
+        </Box>
+        
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, mb: 4 }}>
+          <Box sx={{ 
+            width: { xs: '100%', sm: 180 }, 
+            height: { xs: 180, sm: 120 },
+            mr: { sm: 3 },
+            mb: { xs: 2, sm: 0 },
+            backgroundImage: `url(${plan.image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: 1,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }} />
           
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, mb: 2 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              {plan.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              {plan.description}
+            </Typography>
             <Box sx={{ 
-              width: { xs: '100%', sm: 120 }, 
-              height: { xs: 120, sm: 80 },
-              mr: { sm: 2 },
-              mb: { xs: 2, sm: 0 },
-              backgroundImage: `url(${plan.image})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              display: 'flex', 
+              justifyContent: 'space-between',
+              alignItems: 'center', 
+              mt: 1,
+              p: 1.5,
+              bgcolor: '#f9f9f9',
               borderRadius: 1
-            }} />
-            
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="body1" fontWeight="medium" gutterBottom>
-                {plan.title}
-              </Typography>
+            }}>
               <Typography variant="body2" color="text.secondary">
-                {plan.description}
+                コース番号：{plan.courseNumber}
               </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                  コース番号：{plan.courseNumber}
-                </Typography>
-                <Typography variant="body1" color="error" fontWeight="bold">
-                  {plan.price.toLocaleString()}円
-                </Typography>
-              </Box>
+              <Typography variant="h6" color="error" fontWeight="bold">
+                {plan.price.toLocaleString()}円
+              </Typography>
             </Box>
           </Box>
         </Box>
-        
-        <BookingForm onSubmit={handleSubmit} tourId={tourId} />
       </Paper>
+      
+      <BookingWorkflow 
+        tourId={tourId} 
+        tourName={plan.title} 
+      />
     </Container>
   );
 };
