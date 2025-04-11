@@ -6,7 +6,7 @@ services:
     container_name: bus-tour-frontend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.bus-tour.rule=Host(`yourdomain.com`)"
+      - "traefik.http.routers.bus-tour.rule=Host(`test01.detascent.com`)"
       - "traefik.http.routers.bus-tour.entrypoints=websecure"
       - "traefik.http.routers.bus-tour.tls.certresolver=lets-encrypt"
     networks:
