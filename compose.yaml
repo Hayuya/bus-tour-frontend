@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: .
+    container_name: bus-tour-frontend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bus-tour.rule=Host(`test01.detascent.com`)"
+      - "traefik.http.routers.bus-tour.entrypoints=websecure"
+      - "traefik.http.routers.bus-tour.tls.certresolver=lets-encrypt"
+    networks:
+      - traefik-net
+
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: always
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesResolvers.lets-encrypt.acme.httpChallenge=true"
+      - "--certificatesResolvers.lets-encrypt.acme.httpChallenge.entryPoint=web"
+      - "--certificatesResolvers.lets-encrypt.acme.email=b182587@outlook.com"
+      - "--certificatesResolvers.lets-encrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" 
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "letsencrypt:/letsencrypt"
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    driver: bridge
+
+volumes:
+  letsencrypt:
