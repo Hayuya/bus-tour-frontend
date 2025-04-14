@@ -88,12 +88,11 @@ const Footer: React.FC = () => {
           <Box sx={{ mb: 2 }}>
             <Box 
               component="img" 
-              src="/images/geiyo-bus-logo.png" 
+              src="geiyo-bus-logo.png" 
               alt="GEIYO BUS" 
               sx={{ 
                 height: 'auto', 
                 width: '220px',
-                filter: 'brightness(0) invert(1)' // 白色表示のためのフィルター
               }}
             />
           </Box>
