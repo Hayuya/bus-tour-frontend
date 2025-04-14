@@ -1,4 +1,3 @@
-// src/components/RegisterComponent.tsx
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -307,48 +306,14 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
         </Typography>
       </Alert>
       
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-        <Box 
-          sx={{ 
-            display: 'flex',
-            alignItems: 'center', 
-            justifyContent: 'center',
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            bgcolor: 'primary.main',
-            color: 'white',
-            mr: 1,
-            fontWeight: 'bold'
-          }}
-        >
-          1
-        </Box>
-        <Typography fontWeight="bold" sx={{ mr: 1 }}>
-          基本情報
-        </Typography>
-        <Box sx={{ flex: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.12)', ml: 2 }} />
-        
-        <Box 
-          sx={{ 
-            display: 'flex',
-            alignItems: 'center', 
-            justifyContent: 'center',
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            bgcolor: activeStep === 1 ? 'primary.main' : 'grey.400',
-            color: 'white',
-            ml: 2,
-            mr: 1,
-            fontWeight: 'bold'
-          }}
-        >
-          2
-        </Box>
-        <Typography fontWeight="bold" color={activeStep === 1 ? 'text.primary' : 'text.secondary'}>
-          緊急連絡先
-        </Typography>
+      <Box sx={{ width: '100%', mb: 4 }}>
+        <Stepper activeStep={activeStep} alternativeLabel>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
       </Box>
       
       <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -356,327 +321,250 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
           <>
             <Box 
               sx={{ 
-                bgcolor: 'primary.main', 
+                bgcolor: '#1976d2', 
                 color: 'white', 
-                py: 1, 
+                py: 1.5, 
                 px: 2, 
                 borderRadius: '4px 4px 0 0',
-                mb: 2
+                mb: 0,
+                display: 'flex',
+                alignItems: 'center'
               }}
             >
               <Typography variant="subtitle1" fontWeight="bold">
-                代表者情報
+                代表者様情報
               </Typography>
             </Box>
             
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="name"
-                  label="お名前"
-                  fullWidth
-                  required
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  error={!!errors.name}
-                  helperText={errors.name}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="nameKana"
-                  label="お名前（カナ）"
-                  fullWidth
-                  required
-                  value={formData.nameKana}
-                  onChange={handleInputChange}
-                  error={!!errors.nameKana}
-                  helperText={errors.nameKana}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="phone"
-                  label="電話番号"
-                  fullWidth
-                  required
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  error={!!errors.phone}
-                  helperText={errors.phone}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
-                  <DatePicker
-                    label="生年月日"
-                    value={formData.birthdate}
-                    onChange={(date) => handleDateChange(date, 'birthdate')}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        required: true,
-                        error: !!errors.birthdate,
-                        helperText: errors.birthdate,
-                        InputProps: {
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                                *
-                              </Box>
-                            </InputAdornment>
-                          ),
-                        }
-                      }
-                    }}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              
-              <Grid item xs={12}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, mb: 2 }}>
-                  <Box
-                    sx={{
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      py: 1,
-                      px: 3,
-                      borderRadius: 1,
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    住所情報
-                  </Box>
-                </Box>
-              </Grid>
-              
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  name="postalCode"
-                  label="郵便番号"
-                  fullWidth
-                  required
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                  error={!!errors.postalCode}
-                  helperText={errors.postalCode}
-                  placeholder="123-4567"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={8}>
-                <FormControl fullWidth required error={!!errors.prefecture}>
-                  <InputLabel id="prefecture-label">都道府県</InputLabel>
-                  <Select
-                    labelId="prefecture-label"
-                    name="prefecture"
-                    value={formData.prefecture}
+            <Paper variant="outlined" sx={{ p: 3, mb: 4, borderTop: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="name"
+                    label="お名前"
+                    fullWidth
+                    required
+                    value={formData.name}
                     onChange={handleInputChange}
-                    label="都道府県"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    }
-                  >
-                    {prefectures.map((pref) => (
-                      <MenuItem key={pref} value={pref}>{pref}</MenuItem>
-                    ))}
-                  </Select>
-                  {errors.prefecture && <FormHelperText>{errors.prefecture}</FormHelperText>}
-                </FormControl>
+                    error={!!errors.name}
+                    helperText={errors.name}
+                    placeholder="例：山田 太郎"
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="nameKana"
+                    label="お名前（カナ）"
+                    fullWidth
+                    required
+                    value={formData.nameKana}
+                    onChange={handleInputChange}
+                    error={!!errors.nameKana}
+                    helperText={errors.nameKana}
+                    placeholder="例：ヤマダ タロウ"
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="phone"
+                    label="電話番号"
+                    fullWidth
+                    required
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    error={!!errors.phone}
+                    helperText={errors.phone}
+                    placeholder="例：090-1234-5678"
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+                    <DatePicker
+                      label="生年月日"
+                      value={formData.birthdate}
+                      onChange={(date) => handleDateChange(date, 'birthdate')}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          required: true,
+                          error: !!errors.birthdate,
+                          helperText: errors.birthdate
+                        }
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
               </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  name="city"
-                  label="市区町村"
-                  fullWidth
-                  required
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  error={!!errors.city}
-                  helperText={errors.city}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+            </Paper>
+            
+            <Box 
+              sx={{ 
+                bgcolor: '#1976d2', 
+                color: 'white', 
+                py: 1.5, 
+                px: 2, 
+                borderRadius: '4px 4px 0 0',
+                mb: 0,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight="bold">
+                ご住所情報
+              </Typography>
+            </Box>
+            
+            <Paper variant="outlined" sx={{ p: 3, mb: 4, borderTop: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    name="postalCode"
+                    label="郵便番号"
+                    fullWidth
+                    required
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                    error={!!errors.postalCode}
+                    helperText={errors.postalCode}
+                    placeholder="例：123-4567"
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={8}>
+                  <FormControl fullWidth required error={!!errors.prefecture}>
+                    <InputLabel id="prefecture-label">都道府県</InputLabel>
+                    <Select
+                      labelId="prefecture-label"
+                      name="prefecture"
+                      value={formData.prefecture}
+                      onChange={handleInputChange}
+                      label="都道府県"
+                    >
+                      {prefectures.map((pref) => (
+                        <MenuItem key={pref} value={pref}>{pref}</MenuItem>
+                      ))}
+                    </Select>
+                    {errors.prefecture && <FormHelperText>{errors.prefecture}</FormHelperText>}
+                  </FormControl>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    name="city"
+                    label="市区町村"
+                    fullWidth
+                    required
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    error={!!errors.city}
+                    helperText={errors.city}
+                    placeholder="例：中央区銀座"
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    name="address"
+                    label="番地"
+                    fullWidth
+                    required
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    error={!!errors.address}
+                    helperText={errors.address}
+                    placeholder="例：1-2-3"
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    name="building"
+                    label="建物名・部屋番号"
+                    fullWidth
+                    value={formData.building}
+                    onChange={handleInputChange}
+                    placeholder="例：〇〇マンション 101号室"
+                  />
+                </Grid>
               </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  name="address"
-                  label="番地"
-                  fullWidth
-                  required
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  error={!!errors.address}
-                  helperText={errors.address}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+            </Paper>
+            
+            <Box 
+              sx={{ 
+                bgcolor: '#1976d2', 
+                color: 'white', 
+                py: 1.5, 
+                px: 2, 
+                borderRadius: '4px 4px 0 0',
+                mb: 0,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight="bold">
+                アカウント情報
+              </Typography>
+            </Box>
+            
+            <Paper variant="outlined" sx={{ p: 3, mb: 4, borderTop: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    name="email"
+                    label="メールアドレス"
+                    type="email"
+                    fullWidth
+                    required
+                    value={formData.email}
+                    disabled // メールアドレスは変更不可
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="password"
+                    label="パスワード"
+                    type="password"
+                    fullWidth
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    error={!!errors.password}
+                    helperText={errors.password || 'パスワードは8文字以上で入力してください'}
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="confirmPassword"
+                    label="パスワード（確認用）"
+                    type="password"
+                    fullWidth
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword}
+                  />
+                </Grid>
               </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  name="building"
-                  label="建物名・部屋番号"
-                  fullWidth
-                  value={formData.building}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              
-              <Grid item xs={12}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, mb: 2 }}>
-                  <Box
-                    sx={{
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      py: 1,
-                      px: 3,
-                      borderRadius: 1,
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    アカウント情報
-                  </Box>
-                </Box>
-              </Grid>
-              
-              <Grid item xs={12}>
-                <TextField
-                  name="email"
-                  label="メールアドレス"
-                  type="email"
-                  fullWidth
-                  required
-                  value={formData.email}
-                  disabled // メールアドレスは変更不可
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="password"
-                  label="パスワード"
-                  type="password"
-                  fullWidth
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  error={!!errors.password}
-                  helperText={errors.password || 'パスワードは8文字以上で入力してください'}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="confirmPassword"
-                  label="パスワード（確認用）"
-                  type="password"
-                  fullWidth
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  error={!!errors.confirmPassword}
-                  helperText={errors.confirmPassword}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            </Grid>
+            </Paper>
           </>
         ) : (
           <>
             <Box 
               sx={{ 
-                bgcolor: 'primary.main', 
+                bgcolor: '#1976d2', 
                 color: 'white', 
-                py: 1, 
+                py: 1.5, 
                 px: 2, 
                 borderRadius: '4px 4px 0 0',
-                mb: 2
+                mb: 0,
+                display: 'flex',
+                alignItems: 'center'
               }}
             >
               <Typography variant="subtitle1" fontWeight="bold">
@@ -684,98 +572,69 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
               </Typography>
             </Box>
             
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="emergencyName"
-                  label="氏名"
-                  fullWidth
-                  required
-                  value={formData.emergencyName}
-                  onChange={handleInputChange}
-                  error={!!errors.emergencyName}
-                  helperText={errors.emergencyName}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="emergencyNameKana"
-                  label="氏名（カナ）"
-                  fullWidth
-                  required
-                  value={formData.emergencyNameKana}
-                  onChange={handleInputChange}
-                  error={!!errors.emergencyNameKana}
-                  helperText={errors.emergencyNameKana}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="emergencyPhone"
-                  label="電話番号"
-                  fullWidth
-                  required
-                  value={formData.emergencyPhone}
-                  onChange={handleInputChange}
-                  error={!!errors.emergencyPhone}
-                  helperText={errors.emergencyPhone}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth required error={!!errors.emergencyRelation}>
-                  <InputLabel id="emergency-relation-label">続柄</InputLabel>
-                  <Select
-                    labelId="emergency-relation-label"
-                    name="emergencyRelation"
-                    value={formData.emergencyRelation}
+            <Paper variant="outlined" sx={{ p: 3, mb: 4, borderTop: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="emergencyName"
+                    label="氏名"
+                    fullWidth
+                    required
+                    value={formData.emergencyName}
                     onChange={handleInputChange}
-                    label="続柄"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <Box component="span" sx={{ color: 'rgba(0, 0, 0, 0.54)', width: 20 }}>
-                          *
-                        </Box>
-                      </InputAdornment>
-                    }
-                  >
-                    {relations.map((relation) => (
-                      <MenuItem key={relation} value={relation}>{relation}</MenuItem>
-                    ))}
-                  </Select>
-                  {errors.emergencyRelation && <FormHelperText>{errors.emergencyRelation}</FormHelperText>}
-                </FormControl>
+                    error={!!errors.emergencyName}
+                    helperText={errors.emergencyName}
+                    placeholder="例：山田 花子"
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="emergencyNameKana"
+                    label="氏名（カナ）"
+                    fullWidth
+                    required
+                    value={formData.emergencyNameKana}
+                    onChange={handleInputChange}
+                    error={!!errors.emergencyNameKana}
+                    helperText={errors.emergencyNameKana}
+                    placeholder="例：ヤマダ ハナコ"
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    name="emergencyPhone"
+                    label="電話番号"
+                    fullWidth
+                    required
+                    value={formData.emergencyPhone}
+                    onChange={handleInputChange}
+                    error={!!errors.emergencyPhone}
+                    helperText={errors.emergencyPhone}
+                    placeholder="例：090-1234-5678"
+                  />
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth required error={!!errors.emergencyRelation}>
+                    <InputLabel id="emergency-relation-label">続柄</InputLabel>
+                    <Select
+                      labelId="emergency-relation-label"
+                      name="emergencyRelation"
+                      value={formData.emergencyRelation}
+                      onChange={handleInputChange}
+                      label="続柄"
+                    >
+                      {relations.map((relation) => (
+                        <MenuItem key={relation} value={relation}>{relation}</MenuItem>
+                      ))}
+                    </Select>
+                    {errors.emergencyRelation && <FormHelperText>{errors.emergencyRelation}</FormHelperText>}
+                  </FormControl>
+                </Grid>
               </Grid>
-            </Grid>
+            </Paper>
           </>
         )}
         
@@ -784,7 +643,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
             <Button
               variant="outlined"
               onClick={onBackToEmailCheck}
-              sx={{ px: 3 }}
+              sx={{ px: 4, py: 1.5, fontSize: '1rem' }}
             >
               メールアドレス入力に戻る
             </Button>
@@ -792,7 +651,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
             <Button
               variant="outlined"
               onClick={handleBack}
-              sx={{ px: 3 }}
+              sx={{ px: 4, py: 1.5, fontSize: '1rem' }}
             >
               基本情報に戻る
             </Button>
@@ -804,7 +663,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
               variant="contained"
               color="primary"
               disabled={loading}
-              sx={{ px: 3 }}
+              sx={{ px: 4, py: 1.5, fontSize: '1rem', fontWeight: 'bold' }}
             >
               {loading ? <CircularProgress size={24} /> : '登録して次へ進む'}
             </Button>
@@ -812,7 +671,7 @@ const RegisterComponent: React.FC<RegisterComponentProps> = ({
             <Button
               variant="contained"
               onClick={handleNext}
-              sx={{ px: 3 }}
+              sx={{ px: 4, py: 1.5, fontSize: '1rem', fontWeight: 'bold' }}
             >
               次へ進む
             </Button>
