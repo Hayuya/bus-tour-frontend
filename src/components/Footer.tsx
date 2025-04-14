@@ -88,7 +88,7 @@ const Footer: React.FC = () => {
           <Box sx={{ mb: 2 }}>
             <Box 
               component="img" 
-              src="geiyo-bus-logo.png" 
+              src="/geiyo-bus-logo.png" 
               alt="GEIYO BUS" 
               sx={{ 
                 height: 'auto', 
