@@ -15,7 +15,7 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
   {
     id: 3,
@@ -47,7 +47,7 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
   {
     id: 4,
@@ -63,7 +63,7 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
   {
     id: 5,
@@ -79,7 +79,7 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
   {
     id: 6,
@@ -95,7 +95,7 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
   {
     id: 7,
@@ -111,7 +111,7 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
   {
     id: 8,
@@ -127,6 +127,6 @@ export const samplePlans = [
       lunch: 0,
       dinner: 0
     },
-    image: 'sushi.png'
+    image: '/sushi.png'
   },
 ];
