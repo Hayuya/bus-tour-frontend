@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LaunchIcon from '@mui/icons-material/Launch';
 
-const Header: React.FC = () => {
+const Header = () => {
   return (
     <AppBar
       position="static"
@@ -22,46 +22,51 @@ const Header: React.FC = () => {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
       }}
     >
-      <Container maxWidth="lg">
+      {/* Logo Area */}
+      <Container>
         <Toolbar
           disableGutters
           sx={{
-            height: 90,
             display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
+            flexDirection: { xs: 'column', sm: 'row' },
             alignItems: 'center',
-            py: 1,
+            justifyContent: 'space-between',
+            py: { xs: 1, sm: 1.5 },
+            gap: { xs: 1, sm: 0 },
           }}
         >
-          {/* 左側：ハミングツアーロゴ */}
-          <Box sx={{ 
-            flexGrow: 1, 
-            display: 'flex', 
-            alignItems: 'center',
-            justifyContent: { xs: 'center', md: 'flex-start' },
-            mb: { xs: 1, md: 0 }
-          }}>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
+          {/* Logo */}
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'center',
+              width: { xs: '100%', sm: 'auto' },
+            }}
+          >
+            <Link to="/">
               <img 
                 src="/humming-tour-logo.png" 
                 alt="芸陽観光ハミングツアー" 
                 style={{ 
                   height: 'auto',
-                  width: '280px',
+                  width: '240px',
                   maxWidth: '100%'
                 }} 
               />
             </Link>
           </Box>
 
-          {/* 右側：公式サイトリンクと電話番号 */}
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: 'center',
-            gap: { xs: 1, sm: 3 }
-          }}>
-            {/* 芸陽バス公式ホームページへのリンク */}
+          {/* Contact Info */}
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: 'center',
+              gap: { xs: 1, sm: 2 },
+              width: { xs: '100%', sm: 'auto' },
+            }}
+          >
+            {/* Website Link */}
             <Button
               component="a"
               href="https://geiyo.co.jp"
@@ -70,30 +75,47 @@ const Header: React.FC = () => {
               startIcon={<LaunchIcon />}
               sx={{ 
                 color: '#0068B7',
+                fontSize: { xs: '0.8rem', sm: '0.875rem' },
                 fontWeight: 'bold',
                 textTransform: 'none',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 104, 183, 0.08)'
-                }
+                px: { xs: 1, sm: 2 },
+                whiteSpace: 'nowrap',
               }}
             >
               芸陽バス公式ホームページ
             </Button>
 
-            {/* 区切り線（モバイル表示では非表示） */}
-            <Divider orientation="vertical" flexItem sx={{ height: 24, display: { xs: 'none', sm: 'block' } }} />
+            {/* Divider - only show on sm and above */}
+            <Divider 
+              orientation="vertical" 
+              flexItem 
+              sx={{ 
+                height: 24, 
+                display: { xs: 'none', sm: 'block' } 
+              }} 
+            />
 
-            {/* 電話番号 */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              bgcolor: '#f5f5f5',
-              px: 2,
-              py: 0.5,
-              borderRadius: 1
-            }}>
-              <PhoneIcon sx={{ mr: 1, color: '#0068B7' }} />
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+            {/* Phone */}
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                bgcolor: '#f5f5f5',
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                width: { xs: '100%', sm: 'auto' },
+                justifyContent: 'center'
+              }}
+            >
+              <PhoneIcon sx={{ mr: 0.5, color: '#0068B7', fontSize: { xs: '1rem', sm: '1.25rem' } }} />
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  fontWeight: 'bold',
+                  fontSize: { xs: '0.9rem', sm: '1rem' } 
+                }}
+              >
                 084-941-4131
               </Typography>
             </Box>
@@ -101,15 +123,11 @@ const Header: React.FC = () => {
         </Toolbar>
       </Container>
 
-      {/* メニューバー（任意、必要に応じて） */}
-      <Box sx={{ bgcolor: '#0068B7', display: 'flex', justifyContent: 'center' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: { xs: 'center', md: 'flex-start' },
-            overflowX: { xs: 'auto', md: 'visible' },
-            py: 1
-          }}>
+      {/* Blue Navigation Bar */}
+      <Box sx={{ bgcolor: '#0068B7' }}>
+        <Container>
+          <Box sx={{ py: 1 }}>
+            {/* Menu items would go here */}
           </Box>
         </Container>
       </Box>
