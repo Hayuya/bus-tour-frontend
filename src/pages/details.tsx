@@ -391,26 +391,33 @@ const DetailsPage: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Tour Summary Card */}
-      <Card sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+      <Card sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, overflow: 'visible' }}>
         <CardMedia
           component="img"
           sx={{ 
-            width: { xs: '100%', md: 300 },
-            height: { xs: 200, md: 'auto' },
-            objectFit: 'cover',
+            width: { xs: '100%', md: 400 },
+            height: { xs: 300, md: 300 },
+            objectFit: 'contain',
+            bgcolor: '#f5f5f5',
+            maxHeight: { md: 300 }
           }}
           image={plan.image}
           alt={plan.title}
         />
-        <CardContent sx={{ flex: '1 0 auto', p: 3 }}>
-          <Typography variant="h5" component="h1" gutterBottom>
+        <CardContent sx={{ 
+          flex: '1 1 auto', 
+          p: 3,
+          overflow: 'visible',
+          width: { md: 'calc(100% - 400px)' }
+        }}>
+          <Typography variant="h6" component="h1" gutterBottom sx={{ wordBreak: 'break-word' }}>
             {plan.title}
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph>
             {plan.description}
           </Typography>
           
-          <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid container spacing={1} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
               <Typography variant="body2" color="text.secondary">
                 出発地: {plan.departure}
@@ -429,7 +436,7 @@ const DetailsPage: React.FC = () => {
             </Grid>
           </Grid>
           
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 2 }}>
             <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
               旅行代金
             </Typography>
