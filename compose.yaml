@@ -1,5 +1,4 @@
-version: "3.9"
-
+# docker-compose.yaml
 services:
   frontend:
     build: .
@@ -10,7 +9,8 @@ services:
       - "traefik.http.routers.bus-tour.entrypoints=websecure"
       - "traefik.http.routers.bus-tour.tls.certresolver=lets-encrypt"
       - "traefik.http.routers.bus-tour.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$..."
+      # パスワード「my-secret」をbcryptでハッシュ化したもの（admin / my-secret）
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$dIwVbhZEnrLklzqkVrY/huwcJzAVgUQeRQozOAs8Y6NzpNQwHURvu"
     networks:
       - traefik-net
 
@@ -41,6 +41,8 @@ services:
     build: ./watchdog
     container_name: watchdog
     restart: always
+    labels:
+      - "traefik.enable=false"  # Traefikのエラーを回避
     networks:
       - traefik-net
 
