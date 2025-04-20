@@ -4,14 +4,13 @@ services:
   frontend:
     build: .
     container_name: bus-tour-frontend
-    image: your-react-app  # build するならこれは不要でもOK
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.bus-tour.rule=Host(`test01.detascent.com`)"
       - "traefik.http.routers.bus-tour.entrypoints=websecure"
       - "traefik.http.routers.bus-tour.tls.certresolver=lets-encrypt"
       - "traefik.http.routers.bus-tour.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$0psW/YylYHsjbX9qQXrGYOpHduerqHw5wHl8H5rVX29n9wiEOuFF6"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$..."
     networks:
       - traefik-net
 
@@ -31,10 +30,17 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080" 
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "letsencrypt:/letsencrypt"
+    networks:
+      - traefik-net
+
+  watchdog:
+    build: ./watchdog
+    container_name: watchdog
+    restart: always
     networks:
       - traefik-net
 
