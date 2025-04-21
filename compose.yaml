@@ -10,7 +10,7 @@ services:
       - "traefik.http.routers.bus-tour.tls.certresolver=lets-encrypt"
       - "traefik.http.routers.bus-tour.middlewares=auth"
       # パスワード「my-secret」をbcryptでハッシュ化したもの（admin / my-secret）
-      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$dIwVbhZEnrLklzqkVrY/huwcJzAVgUQeRQozOAs8Y6NzpNQwHURvu"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$novYR9gYZuot6YMDAR//y.RGvCZKjfWvh6OCbv6DTYgKfeZzakTq6"
     networks:
       - traefik-net
 
