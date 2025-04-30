@@ -11,7 +11,7 @@ services:
       - "traefik.http.routers.bus-tour.entrypoints=websecure"
       - "traefik.http.routers.bus-tour.tls.certresolver=myresolver"
       - "traefik.http.routers.bus-tour.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$0psW/YylYHsjbX9qQXrGYOpHduerqHw5wHl8H5rVX29n9wiEOuFF6"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$2b$12$TG7Tha4FU8rWpzbqB6.0Ru4sk6yPrzOs.baZesrXae9TXI2kPNH3K"
     networks:
       - traefik-net
 
