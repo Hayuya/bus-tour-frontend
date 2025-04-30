@@ -7,7 +7,7 @@ services:
     image: your-react-app
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.bus-tour.rule=Host(`test01.detascent.com`)"
+      - "traefik.http.routers.bus-tour.rule=Host(`test02.detascent.com`)"
       - "traefik.http.routers.bus-tour.entrypoints=websecure"
       - "traefik.http.routers.bus-tour.tls.certresolver=myresolver"
       - "traefik.http.routers.bus-tour.middlewares=auth"
