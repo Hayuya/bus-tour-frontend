@@ -4,11 +4,14 @@ services:
   frontend:
     build: .
     container_name: bus-tour-frontend
+    image: your-react-app
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.bus-tour.rule=Host(`test01.detascent.com`)"
       - "traefik.http.routers.bus-tour.entrypoints=websecure"
-      - "traefik.http.routers.bus-tour.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.bus-tour.tls.certresolver=myresolver"
+      - "traefik.http.routers.bus-tour.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$0psW/YylYHsjbX9qQXrGYOpHduerqHw5wHl8H5rVX29n9wiEOuFF6"
     networks:
       - traefik-net
 
@@ -21,17 +24,17 @@ services:
       - "--providers.docker=true"
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
-      - "--certificatesResolvers.lets-encrypt.acme.httpChallenge=true"
-      - "--certificatesResolvers.lets-encrypt.acme.httpChallenge.entryPoint=web"
-      - "--certificatesResolvers.lets-encrypt.acme.email=b182587@outlook.com"
-      - "--certificatesResolvers.lets-encrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesResolvers.myresolver.acme.httpChallenge=true"
+      - "--certificatesResolvers.myresolver.acme.httpChallenge.entryPoint=web"
+      - "--certificatesResolvers.myresolver.acme.email=your@email.com"
+      - "--certificatesResolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080" 
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "letsencrypt:/letsencrypt"
+      - "./letsencrypt:/letsencrypt"
     networks:
       - traefik-net
 
@@ -41,30 +44,3 @@ networks:
 
 volumes:
   letsencrypt:
-services:
-  traefik:
-    image: traefik:v2.11
-    command:
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.docker=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
-      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.myresolver.acme.email=your@email.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-
-  frontend:
-    image: your-react-app
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`your-app.example.com`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
-      - "traefik.http.routers.frontend.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users=admin:$2y$05$0psW/YylYHsjbX9qQXrGYOpHduerqHw5wHl8H5rVX29n9wiEOuFF6"
